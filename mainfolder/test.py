@@ -1,5 +1,7 @@
 from nucleo.library import Library
 from models import Anime
+
+## ranked() test
 lib = Library()
 a = lib.add(Anime(title="FMA", genres=["Action"]))
 b = lib.add(Anime(title="Toradora", genres=["Romance"]))
@@ -14,3 +16,5 @@ lib.create_list("Favorites")
 lib.addToList("Favorites", b.id)
 assert [x.title for x in lib.ranked(list_name="Favorites")] == ["Toradora"]
 print("ranked() works")
+## test end
+

@@ -76,5 +76,10 @@ class Library:
         
         cList = rated
         return sorted(cList, key=lambda anime: anime.rating, reverse=True)
+
+    def removeList(self, list_name: str):
+        if list_name not in self._lists:
+            raise KeyError(f"RemoveListError: List {list_name} does not exist")
+        del self._lists[list_name]
     
             

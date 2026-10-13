@@ -1,7 +1,7 @@
 from database import db
 import sqlite3
 
-conn = db.get_connection("anitracker.db")
+conn = db.get_connection()
 db.init_db(conn)
 tables = conn.execute("SELECT name FROM sqlite_master WHERE type = 'table'").fetchall()
 print(f"1. - tables: {tables}")
@@ -20,6 +20,7 @@ except sqlite3.IntegrityError as e:
 
 conn.execute("INSERT INTO anime (title) VALUES (?)", ("Solo Leveling",))
 conn.execute("INSERT INTO list_items (list_id, anime_id) VALUES (?, ?)", (1, 1))
+conn.execute("DELETE FROM anime WHERE id = ?", (1,))
 conn.commit()
 everything = conn.execute("SELECT * FROM list_items").fetchall()
 print(f"3. ok" if everything == [] else f"3. not ok: {everything}")

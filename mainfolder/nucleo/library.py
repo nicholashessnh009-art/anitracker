@@ -1,23 +1,43 @@
 from models import Anime
+import sqlite3
+import json
 
 class Library:
-    def __init__(self):
-        self._anime: dict[int, Anime] = {}
-        self._lists: dict[str, set[int]] = {}
-        self._next_id = 1
+    def __init__(self, conn: sqlite3.Connection):
+        self._conn = conn
+    
+    def _row_conversion(self, row: sqlite3.Row):
+        return Anime(
+                    id=row["id"],
+                    anilist_id=row["anilist_id"],
+                    title=row["title"],
+                    episodes=row["episodes"],
+                    genres=json.loads(row["genres"]),
+                    rating=row["rating"],
+                    media_type=row["media_type"],
+                )
 
     def add(self, anime: Anime):
-        anime.id = self._next_id
-        self._anime[anime.id] = anime
-        self._next_id += 1
+        cursor = self._conn.execute(
+            "INSERT INTO anime (anilist_id, title, episodes, genres, rating, media_type) VALUES (?, ?, ?, ?, ?, ?)",
+            (anime.anilist_id, anime.title, anime.episodes, json.dumps(anime.genres), anime.rating, anime.media_type,)
+        )
+        self._conn.commit()
+        anime.id = cursor.lastrowid
         return anime
-    
-    def get(self, anime_id: int): #anime or none
-        return self._anime.get(anime_id)
 
-    
+    def get(self, anime_id: int): #anime or none
+        cursor = self._conn.execute("SELECT * FROM anime WHERE id = ?", (anime_id,))
+        row = cursor.fetchone()
+        if row is None:
+            return None
+        else:
+            return self._row_conversion(row)
+
     def all(self):
-        return list(self._anime.values())
+        cursor = self._conn.execute("SELECT * FROM anime").fetchall()
+        return [self._row_conversion(row) for row in cursor]
+    
     
     def rate(self, anime_id: int, rating: int):
         if not 1 <= rating <= 10:
@@ -25,13 +45,19 @@ class Library:
         anime = self.get(anime_id)
         if anime is None:
             raise ValueError(f"Anime with id {anime_id} not found")
-        anime.rating = rating
+        cursor = self._conn.execute("UPDATE anime SET rating = ? WHERE id = ?", (rating, anime_id))
+        if cursor.rowcount == 0:
+            raise ValueError(f"Anime with id {anime_id} not found")
+        else:
+            self._conn.commit()
+
 
     def remove(self, anime_id: int):
-        if anime_id in self._anime:
-            del self._anime[anime_id]
-        for i in self._lists.values():
-            i.discard(anime_id)
+        cursor = self._conn.execute("DELETE FROM anime WHERE id = ?", (anime_id,))
+        if cursor.rowcount == 0:
+            raise ValueError(f"Anime with id {anime_id} not found")
+        else:
+            self._conn.commit()
 
     def create_list(self, list_name: str):
         if list_name in self._lists:

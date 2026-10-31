@@ -26,7 +26,7 @@ class Library:
     def add(self, anime: Anime):
         try:
             cursor = self._conn.execute(
-                "INSERT INTO anime (anilist_id, title, episodes, genres, rating, media_type, cover) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO anime (anilist_id, title, episodes, genres, rating, media_type, cover_url) VALUES (?, ?, ?, ?, ?, ?, ?)",
                 (anime.anilist_id, anime.title, anime.episodes, json.dumps(anime.genres), anime.rating, anime.media_type, anime.cover_url)
             )
         except sqlite3.IntegrityError:

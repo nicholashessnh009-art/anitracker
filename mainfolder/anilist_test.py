@@ -1,31 +1,29 @@
-import requests
-API_URL = "https://graphql.anilist.co"
-## hmmmm puta merda como vou fazer isso daquii
-QUERY = """
-query($search: String) {
-    Page(perPage: 5) {
-        media(search: $search, type: ANIME)  {
-        id
-        title {romaji english}
-        episodes
-        genres
-        coverImage {large}
-        averageScore
-        }
-    }
-}"""
+
+from database.db import get_connection, init_db
+from nucleo.library import Library
+from services.anilist import searchForAnime, AniListError
+
+results = searchForAnime("code geass", limit=3)
+for a in results:
+    print(a.anilist_id, a.title, a.episodes, a.genres, a.cover_url)
+
+assert searchForAnime("   ") == []                  # empty search → no request
+
+conn = get_connection(":memory:")
+init_db(conn)
+lib = Library(conn)
+
+saved = lib.add(results[0])
+loaded = lib.get(saved.id)
+assert loaded.anilist_id == results[0].anilist_id
+assert loaded.cover_url == results[0].cover_url   # the new column works
+
 try:
-    response = requests.post(API_URL, json = {"query": QUERY, "variables": {"search": "Code Geass"}}, timeout=10,)
-    checker = response.raise_for_status()
-    if checker is not None:
-        print(response.text)
-    data = response.json()
-    for media in data["data"]["Page"]["media"]:
-        title = media["title"]["english"] or media["title"]["romaji"]
-        print(media['id'], " ", title, " ", media['episodes'], " ", media['genres'], " ", media['averageScore'])
-except requests.exceptions.ConnectionError:
-    print("Connection error: No Internet")
-except requests.exceptions.Timeout:
-    print("Request timed out")
-except requests.exceptions.HTTPError as e:
-    print(f"API error occurred: {e.response.status_code} - {e.response.reason}")
+    lib.add(results[0])
+    assert False, "duplicate should fail"
+except ValueError as e:
+    print("Blocked duplicate:", e)
+
+print("AniList → Library works")
+
+# movi para services/anilist.py

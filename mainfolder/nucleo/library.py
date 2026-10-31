@@ -16,7 +16,12 @@ class Library:
                     rating=row["rating"],
                     media_type=row["media_type"],
                 )
-
+    def _list_id(self, list_name: str):
+        row = self._conn.execute("SELECT id FROM lists WHERE name = ?", (list_name,)).fetchone()
+        if row is None:
+            raise KeyError(f"List {list_name} does not exist")
+        return row["id"]
+    
     def add(self, anime: Anime):
         cursor = self._conn.execute(
             "INSERT INTO anime (anilist_id, title, episodes, genres, rating, media_type) VALUES (?, ?, ?, ?, ?, ?)",
@@ -42,12 +47,11 @@ class Library:
     def rate(self, anime_id: int, rating: int):
         if not 1 <= rating <= 10:
             raise ValueError("Rating error: rating must be between 1 and 10")
-        anime = self.get(anime_id)
-        if anime is None:
-            raise ValueError(f"Anime with id {anime_id} not found")
+    
+        
         cursor = self._conn.execute("UPDATE anime SET rating = ? WHERE id = ?", (rating, anime_id))
         if cursor.rowcount == 0:
-            raise ValueError(f"Anime with id {anime_id} not found")
+            raise KeyError(f"Anime with id {anime_id} not found")
         else:
             self._conn.commit()
 
@@ -55,32 +59,29 @@ class Library:
     def remove(self, anime_id: int):
         cursor = self._conn.execute("DELETE FROM anime WHERE id = ?", (anime_id,))
         if cursor.rowcount == 0:
-            raise ValueError(f"Anime with id {anime_id} not found")
+            raise KeyError(f"Anime with id {anime_id} not found")
         else:
             self._conn.commit()
 
     def create_list(self, list_name: str):
-        if list_name in self._lists:
-            raise KeyError(f"AddListError: List {list_name} already exists")
-        self._lists[list_name] = set()
+        try: 
+            self._conn.execute("INSERT INTO lists (name) VALUES (?)", (list_name,))
+        except sqlite3.IntegrityError:
+            raise ValueError(f"CreateListError: List {list_name} already exists")
+        self._conn.commit()
 
     def addToList(self, list_name: str, anime_id: int):
-        if list_name not in self._lists:
-            raise KeyError(f"AddToListError: List {list_name} does not exist")
-        if anime_id not in self._anime:
+        list_id = self._list_id(list_name)
+        if self.get(anime_id) is None:
             raise KeyError(f"AddToListError: Anime with id {anime_id} does not exist")
-        self._lists[list_name].add(anime_id)
+        self._conn.execute("INSERT OR IGNORE INTO list_items (list_id, anime_id) VALUES (?, ?)", (list_id, anime_id),)
+        self._conn.commit()
 
     def getList(self, list_name: str):
-        if list_name not in self._lists:
-            raise KeyError(f"GetListError: List {list_name} does not exist")
-        result = []
-        for anime_id in self._lists[list_name]:
-            anime = self.get(anime_id)
-            if anime is not None:
-                result.append(anime)
-        return result
+        list_id = self._list_id(list_name)
     
+        rows = self._conn.execute("SELECT anime.* FROM anime JOIN list_items ON list_items.anime_id = anime.id WHERE list_items.list_id = ? ", (list_id,),).fetchall()
+        return [self._row_conversion(row) for row in rows]
     def ranked(self, genre: str | None = None, list_name: str | None = None):
         if list_name is not None:
             cList = self.getList(list_name)
@@ -104,8 +105,8 @@ class Library:
         return sorted(cList, key=lambda anime: anime.rating, reverse=True)
 
     def removeList(self, list_name: str):
-        if list_name not in self._lists:
-            raise KeyError(f"RemoveListError: List {list_name} does not exist")
-        del self._lists[list_name]
+        list_id = self._list_id(list_name)
+        self._conn.execute("DELETE FROM lists WHERE id = ?", (list_id,))
+        self._conn.commit()
     
             

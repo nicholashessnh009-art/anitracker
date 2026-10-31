@@ -15,6 +15,7 @@ class Library:
                     genres=json.loads(row["genres"]),
                     rating=row["rating"],
                     media_type=row["media_type"],
+                    cover_url=row["cover_url"],
                 )
     def _list_id(self, list_name: str):
         row = self._conn.execute("SELECT id FROM lists WHERE name = ?", (list_name,)).fetchone()
@@ -23,10 +24,13 @@ class Library:
         return row["id"]
     
     def add(self, anime: Anime):
-        cursor = self._conn.execute(
-            "INSERT INTO anime (anilist_id, title, episodes, genres, rating, media_type) VALUES (?, ?, ?, ?, ?, ?)",
-            (anime.anilist_id, anime.title, anime.episodes, json.dumps(anime.genres), anime.rating, anime.media_type,)
-        )
+        try:
+            cursor = self._conn.execute(
+                "INSERT INTO anime (anilist_id, title, episodes, genres, rating, media_type, cover) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                (anime.anilist_id, anime.title, anime.episodes, json.dumps(anime.genres), anime.rating, anime.media_type, anime.cover_url)
+            )
+        except sqlite3.IntegrityError:
+            raise ValueError(f"Anime already in library: {anime.title}")
         self._conn.commit()
         anime.id = cursor.lastrowid
         return anime

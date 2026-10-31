@@ -10,7 +10,8 @@ CREATE TABLE IF NOT EXISTS anime (
     episodes    INTEGER,
     genres      TEXT NOT NULL DEFAULT '[]',
     rating      INTEGER CHECK (rating BETWEEN 1 AND 10),
-    media_type  TEXT NOT NULL DEFAULT 'anime'
+    media_type  TEXT NOT NULL DEFAULT 'anime',
+    cover_url TEXT
 );
 
 CREATE TABLE IF NOT EXISTS lists (

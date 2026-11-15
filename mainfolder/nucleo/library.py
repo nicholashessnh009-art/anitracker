@@ -114,3 +114,11 @@ class Library:
         self._conn.commit()
     
             
+    def listNames(self):
+        rows = self._conn.execute("SELECT name FROM lists ORDER BY name").fetchall()
+        return [row["name"] for row in rows]
+
+    def removeFromList(self, list_name, anime_id):
+        list_id = self._list_id(list_name)
+        cursor = self._conn.execute("DELETE FROM list_items WHERE list_id = ? AND anime_id = ?", (list_id, anime_id))
+        self._conn.commit()

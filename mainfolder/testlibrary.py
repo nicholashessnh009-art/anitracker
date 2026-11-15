@@ -1,7 +1,7 @@
 from database.db import get_connection, init_db
 from nucleo.library import Library
 from models import Anime
-conn = get_connection()
+conn = get_connection(':memory:')
 init_db(conn)
 lib = Library(conn)
 # ani_title = input("Enter anime title: ")
@@ -51,3 +51,12 @@ try:
 except KeyError:
     pass
 print("Lists work with SQLite")
+lib.create_list("Watchlist")
+lib.addToList("Watchlist", b.id)
+lib.listNames()
+lib.create_list("1")
+lib.create_list("2")
+print(lib.listNames())
+assert lib.listNames() != ["Watchlist"]
+lib.removeFromList("Watchlist", b.id)
+print(lib.getList("Watchlist"))

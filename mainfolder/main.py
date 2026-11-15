@@ -1,51 +1,19 @@
-import requests
-import PySide6.QtWidgets as QtWidgets
-import PySide6.QtCore as QtCore
+import sys
+from PySide6.QtWidgets import QApplication
+from database.db import get_connection, init_db
 from nucleo.library import Library
+from ui.main_window import MainWindow
 
-API_URL = "https://graphql.anilist.co"
+def main():
+    conn = get_connection()
+    init_db(conn)
+    lib = Library(conn)
+    app = QApplication(sys.argv)
+    janela = MainWindow(lib)
+    janela.show()
+    app.exec()
 
-## pyside6 test, delete later
+    conn.close()
 
-class MainWindow(QtWidgets.QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle('Test app')
-
-        container = QtWidgets.QWidget()
-        self.setCentralWidget(container)
-
-        layout = QtWidgets.QHBoxLayout(container)
-
-
-
-        label1 = QtWidgets.QLabel('Hello World1')
-        label1.setAlignment(QtCore.Qt.AlignCenter)
-
-        label2 = QtWidgets.QLabel('Hello World2')
-        label2.setAlignment(QtCore.Qt.AlignCenter)
-
-        label3 = QtWidgets.QLabel('Hello World3')
-        label3.setAlignment(QtCore.Qt.AlignCenter)
-
-        label4 = QtWidgets.QLabel('Hello World4')
-        label4.setAlignment(QtCore.Qt.AlignCenter)
-
-        button = QtWidgets.QPushButton('Click me!')
-        dropdown = QtWidgets.QComboBox()
-        dropdown.addItems(['First option', 'Second option'])
-        layout.addWidget(button)
-        layout.addWidget(label1)
-        layout.addWidget(label2)
-        layout.addWidget(label3)
-        layout.addWidget(label4)
-        layout.addWidget(dropdown)
-
-app = QtWidgets.QApplication()
-window = MainWindow()
-window.show()
-
-app.exec()
-
-
-# PROGRESSSSS
+if __name__ == "__main__":
+        main()

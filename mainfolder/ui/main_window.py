@@ -2,6 +2,8 @@ import requests
 from PySide6.QtWidgets import *
 import PySide6.QtCore as QtCore
 from nucleo.library import Library
+from services.anilist import searchForAnime, AniListError
+from PySide6.QtGui import QPixmap
 
 # modelo da janela principal
 
@@ -38,12 +40,14 @@ class MainWindow(QMainWindow):
         middle.addWidget(self.table)
 
         # painel da direita (detalhes do anime selecionado)
-
+        self.cover_label = QLabel()
+        
         self.info_label = QLabel("Select an anime")
         self.info_label.setWordWrap(True)
         right = QVBoxLayout()
         right.addWidget(QLabel("Anime Info"))
         right.addWidget(self.info_label)
+        right.addWidget(self.cover_label)
         right.addStretch()
 
 
@@ -62,4 +66,60 @@ class MainWindow(QMainWindow):
         container.setLayout(main_layout)
         self.setCentralWidget(container)
 
-        # self.refresh_table(self.lib.all())
+
+        self.table.cellClicked.connect(self.show_info)
+        self.search_btn.clicked.connect(self.on_search)
+        self.search_box.returnPressed.connect(self.on_search)
+
+        self.refresh_table(self.lib.all())
+
+
+    def refresh_table(self, animes):
+        self.shown_animes = animes
+        self.table.setRowCount(len(animes))
+        for row, anime in enumerate(animes):
+            self.table.setItem(row, 0, QTableWidgetItem(anime.title))
+            self.table.setItem(row, 1, QTableWidgetItem(str(anime.rating) if anime.rating is not None else "-"))
+    def show_info(self, row, column):
+        anime = self.shown_animes[row]
+        info_text = f"Title: {anime.title}\n"
+        info_text += f"Genres: {', '.join(anime.genres)}\n"
+        info_text += f"Episodes: {anime.episodes if anime.episodes is not None else 'Unknown'}\n"
+        info_text += f"Rating: {anime.rating if anime.rating is not None else 'Not rated'}\n"
+        self.info_label.setText(info_text)
+        self.show_cover(anime.cover_url)
+
+    def on_search(self):
+        text = self.search_box.text()
+        try:
+            results = searchForAnime(text, limit = 12)
+        except AniListError as e:
+            QMessageBox.warning(self, "Search Error", str(e))
+            return
+        if not results:
+            QMessageBox.information(self, "Search", "No results")
+            return
+        titles = [f'{a.title} ({a.episodes or '?'} episodes)' for a in results]
+        choice, check = QInputDialog.getItem(self, "Search Results", "Choose an anime to add", titles, 0, False)
+        if not check:
+            return
+        anime = results[titles.index(choice)]
+        try:
+            self.lib.add(anime)
+        except ValueError as e:
+            QMessageBox.warning(self, "Can't add", str(e))
+            return
+        self.refresh_table(self.lib.all())
+        self.search_box.clear()
+
+    def show_cover(self, url):
+        self.cover_label.clear()
+        if not url:
+            return
+        try:
+            data = requests.get(url, timeout=10).content
+        except requests.exceptions.RequestException:
+            return
+        pixmap = QPixmap()
+        pixmap.loadFromData(data)
+        self.cover_label.setPixmap(pixmap.scaledToWidth(230, QtCore.Qt.SmoothTransformation))

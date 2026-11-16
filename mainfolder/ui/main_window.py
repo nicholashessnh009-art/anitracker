@@ -5,11 +5,13 @@ from nucleo.library import Library
 from services.anilist import searchForAnime, AniListError
 from PySide6.QtGui import QPixmap
 
-ALL_ANIME = "All Anime"
+
 # modelo da janela principal
 
 class MainWindow(QMainWindow):
+    ALL_ANIME = "All Anime"
     def __init__(self, lib):
+        
         super().__init__() 
         # "A função super() em Python é usada para acessar métodos e atributos da classe pai (superclasse)
         #  a partir de uma classe filha (subclasse)."
@@ -77,7 +79,7 @@ class MainWindow(QMainWindow):
         self.search_box.returnPressed.connect(self.on_search)
 
         self.rate_btn.clicked.connect(self.on_rate)
-        self.lists_widget.itemClicked.connect(self.on_list_clicked)
+        # self.lists_widget.itemClicked.connect(self.on_list_clicked)
 
         self.current_list = None
         self.refresh_lists()

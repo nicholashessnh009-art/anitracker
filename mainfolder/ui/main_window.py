@@ -5,6 +5,7 @@ from nucleo.library import Library
 from services.anilist import searchForAnime, AniListError
 from PySide6.QtGui import QPixmap
 
+ALL_ANIME = "All Anime"
 # modelo da janela principal
 
 class MainWindow(QMainWindow):
@@ -38,6 +39,10 @@ class MainWindow(QMainWindow):
         middle = QVBoxLayout()
         middle.addWidget(QLabel("List Viewer ???"))
         middle.addWidget(self.table)
+        self.rate_btn = QPushButton("Rate")
+        buttons = QHBoxLayout()
+        buttons.addWidget(self.rate_btn)
+        middle.addLayout(buttons)
 
         # painel da direita (detalhes do anime selecionado)
         self.cover_label = QLabel()
@@ -71,7 +76,12 @@ class MainWindow(QMainWindow):
         self.search_btn.clicked.connect(self.on_search)
         self.search_box.returnPressed.connect(self.on_search)
 
-        self.refresh_table(self.lib.all())
+        self.rate_btn.clicked.connect(self.on_rate)
+        self.lists_widget.itemClicked.connect(self.on_list_clicked)
+
+        self.current_list = None
+        self.refresh_lists()
+        self.refresh_current()
 
 
     def refresh_table(self, animes):
@@ -109,7 +119,7 @@ class MainWindow(QMainWindow):
         except ValueError as e:
             QMessageBox.warning(self, "Can't add", str(e))
             return
-        self.refresh_table(self.lib.all())
+        self.refresh_current()
         self.search_box.clear()
 
     def show_cover(self, url):
@@ -123,3 +133,31 @@ class MainWindow(QMainWindow):
         pixmap = QPixmap()
         pixmap.loadFromData(data)
         self.cover_label.setPixmap(pixmap.scaledToWidth(230, QtCore.Qt.SmoothTransformation))
+
+    def refresh_current(self):
+        if self.current_list is None:
+            self.refresh_table(self.lib.all())
+        else:
+            self.refresh_table(self.lib.getList(self.current_list))
+
+    def refresh_lists(self):
+        self.lists_widget.clear()
+        self.lists_widget.addItem(self.ALL_ANIME)
+        self.lists_widget.addItems(self.lib.listNames())
+
+    def selected_anime(self):
+        row = self.table.currentRow()
+        if row < 0:
+            QMessageBox.information(self, "No anime selected", "Click an anime in the table first")
+            return None
+        return self.shown_animes[row]
+    def on_rate(self):
+        anime = self.selected_anime()
+        if anime is None:
+            return
+        rating, ok = QInputDialog.getInt(self, "Rate", f"Rating for {anime.title} (1-10):", anime.rating or 5, 1, 10)
+        if not ok:
+            return
+        self.lib.rate(anime.id, rating)
+        self.refresh_current()
+    

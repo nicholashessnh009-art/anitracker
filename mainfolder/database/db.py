@@ -11,7 +11,8 @@ CREATE TABLE IF NOT EXISTS anime (
     genres      TEXT NOT NULL DEFAULT '[]',
     rating      INTEGER CHECK (rating BETWEEN 1 AND 10),
     media_type  TEXT NOT NULL DEFAULT 'anime',
-    cover_url TEXT
+    cover_url TEXT,
+    anilist_score INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS lists (
@@ -40,3 +41,8 @@ def get_connection(path=DEFAULT_DB_PATH) -> sqlite3.Connection:
 
 def init_db(conn: sqlite3.Connection) -> None:
     conn.executescript(SCHEMA)
+
+    try:  # adiciona a coluna anilist_score se não existir (como eu adicionei mais uma coluna)
+        conn.execute("ALTER TABLE anime ADD COLUMN anilist_score INTEGER")
+    except sqlite3.OperationalError:
+        pass # ja existeeee \>O</

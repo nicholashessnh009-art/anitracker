@@ -42,10 +42,10 @@ class MainWindow(QMainWindow):
 
         # painel do meio (tabela)
 
-        self.table = QTableWidget(0, 2)
+        self.table = QTableWidget(0, 3)
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.table.setHorizontalHeaderLabels(["Title", "Rating"])
+        self.table.setHorizontalHeaderLabels(["Title", "My Rating", "User Rating"])
         self.table.verticalHeader().hide()
         self.table.setShowGrid(False)
         self.table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
@@ -126,12 +126,15 @@ class MainWindow(QMainWindow):
         for row, anime in enumerate(animes):
             self.table.setItem(row, 0, QTableWidgetItem(anime.title))
             self.table.setItem(row, 1, QTableWidgetItem(str(anime.rating) if anime.rating is not None else "-"))
+            score = f"{anime.anilist_score / 10:.1f}" if anime.anilist_score is not None else "-"
+            self.table.setItem(row, 2, QTableWidgetItem(score))
     def show_info(self, row, column):
         anime = self.shown_animes[row]
         info_text = f"Title: {anime.title}\n"
         info_text += f"Genres: {', '.join(anime.genres)}\n"
         info_text += f"Episodes: {anime.episodes if anime.episodes is not None else 'Unknown'}\n"
-        info_text += f"Rating: {anime.rating if anime.rating is not None else 'Not rated'}\n"
+        info_text += f"My Rating: {anime.rating if anime.rating is not None else 'Not rated'}\n"
+        info_text += f"User Rating: {anime.anilist_score / 10:.1f}" if anime.anilist_score is not None else "User Rating: Unknown"
         self.info_label.setText(info_text)
         self.show_cover(anime.cover_url)
 

@@ -11,6 +11,7 @@ query($search: String, $perPage: Int) {
         episodes
         genres
         coverImage {large}
+        averageScore
         }
     }
 }"""
@@ -26,7 +27,8 @@ def _media_2_anime(media: dict):
         episodes=media["episodes"],
         genres=media["genres"],
         media_type="anime",
-        cover_url=media["coverImage"]["large"]
+        cover_url=media["coverImage"]["large"],
+        anilist_score = media["averageScore"]
     )
 
 def searchForAnime(text: str, limit: int = 20):

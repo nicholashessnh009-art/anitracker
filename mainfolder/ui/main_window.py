@@ -40,6 +40,8 @@ class MainWindow(QMainWindow):
         # painel do meio (tabela)
 
         self.table = QTableWidget(0, 2)
+        self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.table.setHorizontalHeaderLabels(["Title", "Rating"])
         self.table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
         middle = QVBoxLayout()

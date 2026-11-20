@@ -1,10 +1,10 @@
-import requests
+
 from PySide6.QtWidgets import *
 import PySide6.QtCore as QtCore
 from nucleo.library import Library
 from services.anilist import searchForAnime, AniListError
 from PySide6.QtGui import QPixmap
-
+from services.covers import load_cover
 
 # modelo da janela principal
 
@@ -15,6 +15,7 @@ class MainWindow(QMainWindow):
         super().__init__() 
         # "A função super() em Python é usada para acessar métodos e atributos da classe pai (superclasse)
         #  a partir de uma classe filha (subclasse)."
+        self.cover_pixmap = None
         self.lib = lib
         self.setWindowTitle("AniTracker")
         self.resize(1000, 600)
@@ -69,6 +70,8 @@ class MainWindow(QMainWindow):
 
         # painel da direita (detalhes do anime selecionado)
         self.cover_label = QLabel()
+        self.cover_label.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
+        self.cover_label.setAlignment(QtCore.Qt.AlignCenter)
         
         self.info_label = QLabel("Select an anime")
         self.info_label.setWordWrap(True)
@@ -109,6 +112,9 @@ class MainWindow(QMainWindow):
         self.remove_from_list_btn.clicked.connect(self.on_remove_from_list)
         self.remove_anime_btn.clicked.connect(self.on_remove_anime)
         self.rank_box.toggled.connect(lambda checked: self.refresh_current())
+
+        for btn in self.findChildren(QPushButton):
+            btn.setCursor(QtCore.Qt.PointingHandCursor)
 
         self.refresh_lists()
         self.refresh_current()
@@ -153,16 +159,26 @@ class MainWindow(QMainWindow):
         self.search_box.clear()
 
     def show_cover(self, url):
+        self.cover_pixmap = None
         self.cover_label.clear()
-        if not url:
-            return
-        try:
-            data = requests.get(url, timeout=10).content
-        except requests.exceptions.RequestException:
+        data = load_cover(url)
+        if data is None:
             return
         pixmap = QPixmap()
         pixmap.loadFromData(data)
-        self.cover_label.setPixmap(pixmap.scaledToWidth(230, QtCore.Qt.SmoothTransformation))
+        self.cover_pixmap = pixmap
+        self.update_cover_size()
+
+
+    def update_cover_size(self):
+        if self.cover_pixmap is None or self.cover_pixmap.isNull():
+            return
+        scaled = self.cover_pixmap.scaled(self.cover_label.width(), int(self.height() * 0.6), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+        self.cover_label.setPixmap(scaled)
+ 
+    def resizeEvent(self, event): # automaticamente chamado quando a janela muda d tamanho
+        super().resizeEvent(event)
+        self.update_cover_size()
 
     def refresh_current(self):
         self.viewer_label.setText(self.current_list or "All Anime")

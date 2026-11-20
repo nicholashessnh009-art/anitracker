@@ -9,7 +9,7 @@ QWidget {
        }
 QLabel#heading {
 font-size: 18px;
-font-weigth: bold;
+font-weight: bold;
 }
 QLineEdit, QListWidget, QTableWidget {
 background-color: #181818;

@@ -45,7 +45,8 @@ class MainWindow(QMainWindow):
         self.table.setHorizontalHeaderLabels(["Title", "Rating"])
         self.table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
         middle = QVBoxLayout()
-        middle.addWidget(QLabel("List Viewer ???"))
+        self.viewer_label = QLabel("List Viewer")
+        middle.addWidget(self.viewer_label)
         middle.addWidget(self.table)
         self.rate_btn = QPushButton("Rate")
         buttons = QHBoxLayout()
@@ -159,6 +160,7 @@ class MainWindow(QMainWindow):
         self.cover_label.setPixmap(pixmap.scaledToWidth(230, QtCore.Qt.SmoothTransformation))
 
     def refresh_current(self):
+        self.viewer_label.setText(self.current_list or "All Anime")
         if self.rank_box.isChecked():
             self.refresh_table(self.lib.ranked(list_name=self.current_list))
         elif self.current_list is None:

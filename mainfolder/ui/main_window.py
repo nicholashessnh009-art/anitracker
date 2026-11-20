@@ -162,4 +162,11 @@ class MainWindow(QMainWindow):
             return
         self.lib.rate(anime.id, rating)
         self.refresh_current()
+    def on_list_clicked(self, item):
+        if item.text() == self.ALL_ANIME:
+            self.current_list = None
+        else:
+            self.current_list = item.text()
+        self.refresh_current()
+        
     

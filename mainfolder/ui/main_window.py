@@ -227,7 +227,7 @@ class MainWindow(QMainWindow):
         listname, ok = QInputDialog.getItem(self, "Add to List", f"Choose a list to add {anime.title} to:", listnames, 0, False)
         if not ok:
             return
-        self.lib.add_to_list(listname, anime.id)
+        self.lib.addToList(listname, anime.id)
         self.refresh_current()
 
     def on_remove_from_list(self):

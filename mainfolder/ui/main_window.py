@@ -99,9 +99,9 @@ class MainWindow(QMainWindow):
         self.current_list = None
         self.new_list_btn.clicked.connect(self.on_new_list)
         self.delete_list_btn.clicked.connect(self.on_delete_list)
-        # self.add_to_list_btn.clicked.connect(self.on_add_to_list)
-        # self.remove_from_list_btn.clicked.connect(self.on_remove_from_list)
-        # self.remove_anime_btn.clicked.connect(self.on_remove_anime)
+        self.add_to_list_btn.clicked.connect(self.on_add_to_list)
+        self.remove_from_list_btn.clicked.connect(self.on_remove_from_list)
+        self.remove_anime_btn.clicked.connect(self.on_remove_anime)
         self.rank_box.toggled.connect(lambda checked: self.refresh_current())
 
         self.refresh_lists()
@@ -215,4 +215,41 @@ class MainWindow(QMainWindow):
         self.current_list = None
         self.refresh_lists()
         self.refresh_current()
+
+    def on_add_to_list(self):
+        anime = self.selected_anime()
+        if anime is None:
+            return
+        listnames = self.lib.listNames()
+        if not listnames:
+            QMessageBox.information(self, "No lists", "You have no lists. Create one first.")
+            return
+        listname, ok = QInputDialog.getItem(self, "Add to List", f"Choose a list to add {anime.title} to:", listnames, 0, False)
+        if not ok:
+            return
+        self.lib.add_to_list(listname, anime.id)
+        self.refresh_current()
+
+    def on_remove_from_list(self):
+        if self.current_list is None:
+            QMessageBox.information(self, "No list selected", "Select a list first.")
+            return
+        anime = self.selected_anime()
+        if anime is None:
+            return
+        self.lib.removeFromList(self.current_list, anime.id)
+        self.refresh_current()
+
+    def on_remove_anime(self):
+        anime = self.selected_anime()
+        if anime is None:
+            return
+        reply = QMessageBox.question(self, "Remove anime", f"Are you sure you want to remove {anime.title} from your library? This will also remove it from all lists.")
+        if reply != QMessageBox.Yes:
+            return
+        self.lib.remove(anime.id)
+        self.info_label.setText("Select an anime")
+        self.cover_label.clear()
+        self.refresh_current()
+    
     

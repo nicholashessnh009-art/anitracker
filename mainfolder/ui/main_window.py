@@ -32,6 +32,10 @@ class MainWindow(QMainWindow):
         left = QVBoxLayout()
         left.addWidget(QLabel("Lists"))
         left.addWidget(self.lists_widget)
+        self.new_list_btn = QPushButton("New List")
+        self.delete_list_btn = QPushButton("Delete List")
+        left.addWidget(self.new_list_btn)
+        left.addWidget(self.delete_list_btn)
 
         # painel do meio (tabela)
 
@@ -44,6 +48,15 @@ class MainWindow(QMainWindow):
         self.rate_btn = QPushButton("Rate")
         buttons = QHBoxLayout()
         buttons.addWidget(self.rate_btn)
+        self.add_to_list_btn = QPushButton("Add to List")
+        self.remove_from_list_btn = QPushButton("Remove from List")
+        self.remove_anime_btn = QPushButton("Remove Anime")
+        self.rank_box = QCheckBox("Rank by rating?")
+        buttons.addWidget(self.add_to_list_btn)
+        buttons.addWidget(self.remove_from_list_btn)
+        buttons.addWidget(self.rank_box)
+        buttons.addWidget(self.remove_anime_btn)
+
         middle.addLayout(buttons)
 
         # painel da direita (detalhes do anime selecionado)
@@ -79,9 +92,16 @@ class MainWindow(QMainWindow):
         self.search_box.returnPressed.connect(self.on_search)
 
         self.rate_btn.clicked.connect(self.on_rate)
-        # self.lists_widget.itemClicked.connect(self.on_list_clicked)
+        self.lists_widget.itemClicked.connect(self.on_list_clicked)
 
         self.current_list = None
+        self.new_list_btn.clicked.connect(self.on_new_list)
+        self.delete_list_btn.clicked.connect(self.on_delete_list)
+        # self.add_to_list_btn.clicked.connect(self.on_add_to_list)
+        # self.remove_from_list_btn.clicked.connect(self.on_remove_from_list)
+        # self.remove_anime_btn.clicked.connect(self.on_remove_anime)
+        self.rank_box.toggled.connect(lambda checked: self.refresh_current())
+
         self.refresh_lists()
         self.refresh_current()
 
@@ -137,7 +157,9 @@ class MainWindow(QMainWindow):
         self.cover_label.setPixmap(pixmap.scaledToWidth(230, QtCore.Qt.SmoothTransformation))
 
     def refresh_current(self):
-        if self.current_list is None:
+        if self.rank_box.isChecked():
+            self.refresh_table(self.lib.ranked(list_name=self.current_list))
+        elif self.current_list is None:
             self.refresh_table(self.lib.all())
         else:
             self.refresh_table(self.lib.getList(self.current_list))
@@ -168,5 +190,27 @@ class MainWindow(QMainWindow):
         else:
             self.current_list = item.text()
         self.refresh_current()
-        
+
+    def on_new_list(self):
+        name, ok = QInputDialog.getText(self, "New List", "List name:")
+        if not ok or not name.strip():
+            return
+        try:
+            self.lib.create_list(name.strip())
+        except ValueError as e:
+            QMessageBox.warning(self, "Can't create list", str(e))
+            return
+        self.refresh_lists()
+
+    def on_delete_list(self):
+        if self.current_list is None:
+            QMessageBox.information(self, "No list selected", "Select a list first.")
+            return
+        reply = QMessageBox.question(self, "Delete list", f"Are you sure you wan to delete the list {self.current_list}? The anime will stay in your library.")
+        if reply != QMessageBox.Yes:
+            return
+        self.lib.removeList(self.current_list)
+        self.current_list = None
+        self.refresh_lists()
+        self.refresh_current()
     

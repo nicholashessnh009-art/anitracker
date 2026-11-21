@@ -10,6 +10,10 @@ from services.covers import load_cover
 
 class MainWindow(QMainWindow):
     ALL_ANIME = "All Anime"
+    SORT_DEFAULT = "Order added"
+    SORT_TITLE = "title (A-Z)"
+    SORT_MY_RATING = "my rating (high to low)"
+    SORT_USER_RATING = "user rating (high to low)"
     def __init__(self, lib):
         
         super().__init__() 
@@ -46,9 +50,16 @@ class MainWindow(QMainWindow):
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.table.setHorizontalHeaderLabels(["Title", "My Rating", "User Rating"])
+        header = self.table.horizontalHeader()
+        header.setSectionResizeMode(QHeaderView.Fixed)
+        header.setSectionResizeMode(0, QHeaderView.Stretch)
+        self.table.setColumnWidth(1, 110)
+        self.table.setColumnWidth(2, 110)
         self.table.verticalHeader().hide()
         self.table.setShowGrid(False)
         self.table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+        self.table.horizontalHeader().setHighlightSections(False)
+        self.table.horizontalHeader().setSectionsClickable(False)
         middle = QVBoxLayout()
         self.viewer_label = QLabel("List Viewer")
         self.viewer_label.setObjectName("heading")
@@ -60,10 +71,12 @@ class MainWindow(QMainWindow):
         self.add_to_list_btn = QPushButton("Add to List")
         self.remove_from_list_btn = QPushButton("Remove from List")
         self.remove_anime_btn = QPushButton("Remove Anime")
-        self.rank_box = QCheckBox("Rank by rating?")
+        self.sort_box = QComboBox()
+        self.sort_box.addItems([self.SORT_DEFAULT, self.SORT_TITLE, self.SORT_MY_RATING, self.SORT_USER_RATING])
+        buttons.addWidget(QLabel("Sort by:"))
         buttons.addWidget(self.add_to_list_btn)
         buttons.addWidget(self.remove_from_list_btn)
-        buttons.addWidget(self.rank_box)
+        buttons.addWidget(self.sort_box)
         buttons.addWidget(self.remove_anime_btn)
 
         middle.addLayout(buttons)
@@ -111,10 +124,12 @@ class MainWindow(QMainWindow):
         self.add_to_list_btn.clicked.connect(self.on_add_to_list)
         self.remove_from_list_btn.clicked.connect(self.on_remove_from_list)
         self.remove_anime_btn.clicked.connect(self.on_remove_anime)
-        self.rank_box.toggled.connect(lambda checked: self.refresh_current())
+        self.sort_box.currentIndexChanged.connect(lambda index: self.refresh_current())
 
         for btn in self.findChildren(QPushButton):
             btn.setCursor(QtCore.Qt.PointingHandCursor)
+        for elem in self.findChildren(QComboBox):
+            elem.setCursor(QtCore.Qt.PointingHandCursor)
 
         self.refresh_lists()
         self.refresh_current()
@@ -134,7 +149,7 @@ class MainWindow(QMainWindow):
         info_text += f"Genres: {', '.join(anime.genres)}\n"
         info_text += f"Episodes: {anime.episodes if anime.episodes is not None else 'Unknown'}\n"
         info_text += f"My Rating: {anime.rating if anime.rating is not None else 'Not rated'}\n"
-        info_text += f"User Rating: {anime.anilist_score / 10:.1f}" if anime.anilist_score is not None else "User Rating: Unknown"
+        info_text += f"User Rating: {anime.anilist_score / 10:.1f}" if anime.anilist_score is not None else "User Rating: Unknown\n"
         self.info_label.setText(info_text)
         self.show_cover(anime.cover_url)
 
@@ -185,12 +200,18 @@ class MainWindow(QMainWindow):
 
     def refresh_current(self):
         self.viewer_label.setText(self.current_list or "All Anime")
-        if self.rank_box.isChecked():
-            self.refresh_table(self.lib.ranked(list_name=self.current_list))
-        elif self.current_list is None:
-            self.refresh_table(self.lib.all())
+        if self.current_list is None:
+            animes = self.lib.all()
         else:
-            self.refresh_table(self.lib.getList(self.current_list))
+            animes = self.lib.getList(self.current_list)
+        sort_method = self.sort_box.currentText()
+        if sort_method == self.SORT_TITLE:
+            animes = sorted(animes, key=lambda a: a.title.lower())
+        elif sort_method == self.SORT_MY_RATING:
+            animes = self.lib.ranked(list_name = self.current_list)
+        elif sort_method == self.SORT_USER_RATING:
+            animes = sorted(animes, key=lambda a: a.anilist_score or 0, reverse=True)
+        self.refresh_table(animes)
 
     def refresh_lists(self):
         self.lists_widget.clear()

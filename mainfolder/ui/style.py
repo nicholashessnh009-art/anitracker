@@ -1,3 +1,6 @@
+from pathlib import Path
+ARROW = (Path(__file__).resolve().parent / "arrow.svg").as_posix()
+
 QSS = """
 
 QWidget {
@@ -18,6 +21,9 @@ border-radius: 8px;
 padding: 6px;
 }
 
+QTableWidget::item:hover {
+background-color: #222222;}
+
 QListWidget::item, QTableWidget::item {
 padding: 6px;
 }
@@ -33,6 +39,7 @@ background-color: #181818;
 color: #b3b3b3;
 border: none;
 padding: 6px;
+font-weight: bold;
 }
 
 QPushButton {
@@ -49,22 +56,42 @@ QPushButton:hover {
     background-color: #8a2be2;
 }
 
-QCheckBox {
-    color: #b3b3b3;
+
+
+QComboBox {
+    background-color: #2a2a2a;
+    border: 1px solid #2a2a2a;
+    border-radius: 16px;
+    padding: 6px 12px;
+    min-width: 120px;
+    color: #FFFFFF;
     font-weight: bold;
-}
-
-QCheckBox::indicator {
-    width: 16px;
-    height: 16px;
-    border: 1px solid #b3b3b3;
-    border-radius: 4px;
     }
 
-QCheckBox::indicator:checked {
-    background-color: #a43ae0;
-    border-color: #a43ae0;
+QComboBox:hover {
+    background-color: #121212;
+    }    
+
+QComboBox::drop-down {
+    border: none;
+    width: 28px;
     }
 
+QComboBox::down-arrow {
+    image: url(ARROW_PATH);
+    width: 12px;
+    height: 8px;
+    }
+
+QComboBox QAbstractItemView {
+    background-color: #181818;
+    border: none;
+    outline: none;
+    padding: 4px;
+    selection-background-color: #a43ae0;
+    selection-color: #000000;
+    }
 
 """
+
+QSS = QSS.replace("ARROW_PATH", ARROW)

@@ -1,16 +1,12 @@
 # anitracker
-Second semester AeP project, built on Python
+Projeto de AeP do segundo semestre, feito em Python.
 
-Proposta Software AeP Segundo Semestre:
-Nicholas Hess
+O que é?
+    é um aplicativo feito para registrar séries (animes) que você assiste. Você pode adicionar qualquer anime que você quiser, adicioná-lo em listas, e o avaliar. A Interface foi feita com PySide6. Para rodar o app, apenas execute o arquivo main.py.
 
-Tracker de animes assistidos
-Features:
-Deixa adicionar séries que já assisti
-Criador de listas (favoritos, por categoria etc)
-Placar por rating pessoal (por categoria, listas)
-Fácil de rodar (talvez com uma interface própria)
-Como irei fazer esse projeto?
-Vou pegar uma API de animes como MyAnimeList ou AniList para acessar uma database de animes. Posso expandir para outros tipos de mídia no futuro (filmes, séries, documentários).
-Não sei quais estruturas de dados vou utilizar.
-Meu software terá um menu (se eu conseguir não no terminal, com uma interface própria como um aplicativo).
+Quais são as dependências/coisas necessárias para o app funcionar?
+    Para o app funcionar, você precisa de quatro coisas:
+        1 - Conexão à internet;
+        2 - PySide6 6.12.0;
+        3 - requests 2.34.2;
+        4 - Python 3.12+

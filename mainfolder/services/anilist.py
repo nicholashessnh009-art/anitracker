@@ -1,7 +1,6 @@
 import requests
 from models import Anime
 API_URL = "https://graphql.anilist.co"
-## hmmmm puta merda como vou fazer isso daquii
 QUERY = """
 query($search: String, $perPage: Int) {
     Page(perPage: $perPage) {

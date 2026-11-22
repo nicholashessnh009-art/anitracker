@@ -76,9 +76,10 @@ class MainWindow(QMainWindow):
         self.remove_anime_btn = QPushButton(self.tr("Remove Anime"))
         self.sort_box = QComboBox()
         self.sort_box.addItems([self.SORT_DEFAULT, self.SORT_TITLE, self.SORT_MY_RATING, self.SORT_USER_RATING])
-        buttons.addWidget(QLabel(self.tr("Sort by:")))
+        
         buttons.addWidget(self.add_to_list_btn)
         buttons.addWidget(self.remove_from_list_btn)
+        buttons.addWidget(QLabel(self.tr("Sort by:")))
         buttons.addWidget(self.sort_box)
         buttons.addWidget(self.remove_anime_btn)
 

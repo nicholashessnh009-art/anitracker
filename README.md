@@ -1,6 +1,10 @@
 # anitracker
 Projeto de AeP do segundo semestre, feito em Python.
 
+Feito por Nicholas Hess
+Turma 111 INFO AM do IFsul câmpus Novo Hamburgo
+Professor Lucas Mizusaki
+
 O que é?
 
     é um aplicativo feito para registrar séries (animes) que você assiste. 

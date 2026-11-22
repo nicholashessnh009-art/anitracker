@@ -7,7 +7,9 @@ from ui.main_window import MainWindow
 from ui.style import QSS
 from pathlib import Path
 from PySide6.QtCore import QTranslator, QLocale, QLibraryInfo
-def main():
+from paths import BUNDLE_DIR
+
+def main(language="Português"):
     conn = get_connection()
     init_db(conn)
     lib = Library(conn)
@@ -16,7 +18,7 @@ def main():
     app.setStyleSheet(QSS)
 
     # carrega traduções ptBR
-    if app_language == "Português":
+    if language == "Português":
         translations = Path(__file__).resolve().parent / "translations"
         translator = QTranslator()
         translator.load(str(translations / "anitracker_pt_br.qm"))
@@ -32,6 +34,6 @@ def main():
 
     conn.close()
 
-app_language = "Português" ## se quiser usar o app em inglês, é só mudar app_language para qualquer outra coisa
 if __name__ == "__main__":
-        main()
+        main("Português") 
+ ## se quiser usar o app em inglês, é só mudar language para qualquer outra coisa

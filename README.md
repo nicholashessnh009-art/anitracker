@@ -13,6 +13,7 @@ Quais são as dependências/coisas necessárias para o app funcionar?
         4 - Python 3.12+
 
 Como instalar dependências:
+
     pip install -r dependencias.txt
 
     OU:

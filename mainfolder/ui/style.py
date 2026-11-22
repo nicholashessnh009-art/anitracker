@@ -1,5 +1,6 @@
 from pathlib import Path
-ARROW = (Path(__file__).resolve().parent / "arrow.svg").as_posix()
+from paths import BUNDLE_DIR
+ARROW = (BUNDLE_DIR / "ui" / "arrow.svg").as_posix()
 
 QSS = """
 

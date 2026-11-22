@@ -16,14 +16,15 @@ def main():
     app.setStyleSheet(QSS)
 
     # carrega traduções ptBR
-    translations = Path(__file__).resolve().parent / "translations"
-    translator = QTranslator()
-    translator.load(str(translations / "anitracker_pt_br.qm"))
-    app.installTranslator(translator)
-    # traduz botões padrões do Qt
-    qt_translator = QTranslator()
-    qt_translator.load(QLocale("pt_BR"), "qtbase", "_", QLibraryInfo.path(QLibraryInfo.TranslationsPath))
-    app.installTranslator(qt_translator)
+    if app_language == "Português":
+        translations = Path(__file__).resolve().parent / "translations"
+        translator = QTranslator()
+        translator.load(str(translations / "anitracker_pt_br.qm"))
+        app.installTranslator(translator)
+        # traduz botões padrões do Qt
+        qt_translator = QTranslator()
+        qt_translator.load(QLocale("pt_BR"), "qtbase", "_", QLibraryInfo.path(QLibraryInfo.TranslationsPath))
+        app.installTranslator(qt_translator)
 
     janela = MainWindow(lib)
     janela.show()
@@ -31,5 +32,6 @@ def main():
 
     conn.close()
 
+app_language = "Português" ## se quiser usar o app em inglês, é só mudar app_language para qualquer outra coisa
 if __name__ == "__main__":
         main()

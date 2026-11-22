@@ -11,7 +11,7 @@ def main():
     init_db(conn)
     lib = Library(conn)
     app = QApplication(sys.argv)
-    app.styleHints().setColorScheme(QtCore.Qt.ColorScheme.Dark)
+    app.styleHints().setColorScheme(QtCore.Qt.ColorScheme.Dark) # nao funciona no meu sistema :/
     app.setStyleSheet(QSS)
     janela = MainWindow(lib)
     janela.show()

@@ -9,16 +9,19 @@ from services.covers import load_cover
 # modelo da janela principal
 
 class MainWindow(QMainWindow):
-    ALL_ANIME = "All Anime"
-    SORT_DEFAULT = "Order added"
-    SORT_TITLE = "title (A-Z)"
-    SORT_MY_RATING = "my rating (high to low)"
-    SORT_USER_RATING = "user rating (high to low)"
-    def __init__(self, lib):
+    
+    def __init__(self, lib: Library):
         
         super().__init__() 
         # "A função super() em Python é usada para acessar métodos e atributos da classe pai (superclasse)
         #  a partir de uma classe filha (subclasse)."
+
+        self.ALL_ANIME = self.tr("All Anime")
+        self.SORT_DEFAULT = self.tr("Order added")
+        self.SORT_TITLE = self.tr("title (A-Z)")
+        self.SORT_MY_RATING = self.tr("my rating (high to low)")
+        self.SORT_USER_RATING = self.tr("user rating (high to low)")
+
         self.cover_pixmap = None
         self.lib = lib
         self.setWindowTitle("AniTracker")
@@ -26,8 +29,8 @@ class MainWindow(QMainWindow):
 
         # barra de pesquisa
         self.search_box = QLineEdit()
-        self.search_box.setPlaceholderText("Search for an anime...")
-        self.search_btn = QPushButton("Search")
+        self.search_box.setPlaceholderText(self.tr("Search for an anime..."))
+        self.search_btn = QPushButton(self.tr("Search"))
         top_bar = QHBoxLayout()
         top_bar.addWidget(self.search_box)
         top_bar.addWidget(self.search_btn)
@@ -35,12 +38,12 @@ class MainWindow(QMainWindow):
         # painel de listas
         self.lists_widget = QListWidget()
         left = QVBoxLayout()
-        lists_title = QLabel("Lists")
+        lists_title = QLabel(self.tr("Lists"))
         lists_title.setObjectName("heading")
         left.addWidget(lists_title)
         left.addWidget(self.lists_widget)
-        self.new_list_btn = QPushButton("New List")
-        self.delete_list_btn = QPushButton("Delete List")
+        self.new_list_btn = QPushButton(self.tr("New List"))
+        self.delete_list_btn = QPushButton(self.tr("Delete List"))
         left.addWidget(self.new_list_btn)
         left.addWidget(self.delete_list_btn)
 
@@ -49,7 +52,7 @@ class MainWindow(QMainWindow):
         self.table = QTableWidget(0, 3)
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.table.setHorizontalHeaderLabels(["Title", "My Rating", "User Rating"])
+        self.table.setHorizontalHeaderLabels([self.tr("Title"), self.tr("My Rating"), self.tr("User Rating")])
         header = self.table.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.Fixed)
         header.setSectionResizeMode(0, QHeaderView.Stretch)
@@ -61,19 +64,19 @@ class MainWindow(QMainWindow):
         self.table.horizontalHeader().setHighlightSections(False)
         self.table.horizontalHeader().setSectionsClickable(False)
         middle = QVBoxLayout()
-        self.viewer_label = QLabel("List Viewer")
+        self.viewer_label = QLabel(self.tr("List Viewer"))
         self.viewer_label.setObjectName("heading")
         middle.addWidget(self.viewer_label)
         middle.addWidget(self.table)
-        self.rate_btn = QPushButton("Rate")
+        self.rate_btn = QPushButton(self.tr("Rate"))
         buttons = QHBoxLayout()
         buttons.addWidget(self.rate_btn)
-        self.add_to_list_btn = QPushButton("Add to List")
-        self.remove_from_list_btn = QPushButton("Remove from List")
-        self.remove_anime_btn = QPushButton("Remove Anime")
+        self.add_to_list_btn = QPushButton(self.tr("Add to List"))
+        self.remove_from_list_btn = QPushButton(self.tr("Remove from List"))
+        self.remove_anime_btn = QPushButton(self.tr("Remove Anime"))
         self.sort_box = QComboBox()
         self.sort_box.addItems([self.SORT_DEFAULT, self.SORT_TITLE, self.SORT_MY_RATING, self.SORT_USER_RATING])
-        buttons.addWidget(QLabel("Sort by:"))
+        buttons.addWidget(QLabel(self.tr("Sort by:")))
         buttons.addWidget(self.add_to_list_btn)
         buttons.addWidget(self.remove_from_list_btn)
         buttons.addWidget(self.sort_box)
@@ -86,10 +89,12 @@ class MainWindow(QMainWindow):
         self.cover_label.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
         self.cover_label.setAlignment(QtCore.Qt.AlignCenter)
         
-        self.info_label = QLabel("Select an anime")
+        self.info_label = QLabel(self.tr("Select an anime"))
         self.info_label.setWordWrap(True)
         right = QVBoxLayout()
-        right.addWidget(QLabel("Anime Info"))
+        self.anime_info_title = QLabel(self.tr("Anime Info"))
+        self.anime_info_title.setObjectName("heading")
+        right.addWidget(self.anime_info_title)
         right.addWidget(self.info_label)
         right.addWidget(self.cover_label)
         right.addStretch()
@@ -145,11 +150,16 @@ class MainWindow(QMainWindow):
             self.table.setItem(row, 2, QTableWidgetItem(score))
     def show_info(self, row, column):
         anime = self.shown_animes[row]
-        info_text = f"Title: {anime.title}\n"
-        info_text += f"Genres: {', '.join(anime.genres)}\n"
-        info_text += f"Episodes: {anime.episodes if anime.episodes is not None else 'Unknown'}\n"
-        info_text += f"My Rating: {anime.rating if anime.rating is not None else 'Not rated'}\n"
-        info_text += f"User Rating: {anime.anilist_score / 10:.1f}" if anime.anilist_score is not None else "User Rating: Unknown\n"
+        genres = ', '.join(anime.genres)
+        episodes = anime.episodes if anime.episodes is not None else self.tr('Unknown')
+        myrating = anime.rating if anime.rating is not None else self.tr('Not rated')
+        user_rating = f"{anime.anilist_score / 10:.1f}" if anime.anilist_score is not None else self.tr("Unknown")
+        
+        info_text = self.tr("Title: {title}\n").format(title = anime.title) #### FALTA TRADUZIR, NICHJOLÇAS
+        info_text += self.tr("Genres: {genres}\n").format(genres = genres)
+        info_text += self.tr("Episodes: {episodes}\n").format(episodes = episodes)
+        info_text += self.tr("My Rating: {myrating}\n").format(myrating = myrating)
+        info_text += self.tr("User Rating: {user_rating}").format(user_rating = user_rating)
         self.info_label.setText(info_text)
         self.show_cover(anime.cover_url)
 
@@ -158,20 +168,20 @@ class MainWindow(QMainWindow):
         try:
             results = searchForAnime(text, limit = 12)
         except AniListError as e:
-            QMessageBox.warning(self, "Search Error", str(e))
+            QMessageBox.warning(self, self.tr("Search Error"), str(e))
             return
         if not results:
-            QMessageBox.information(self, "Search", "No results")
+            QMessageBox.information(self, self.tr("Search"), self.tr("No results"))
             return
-        titles = [f'{a.title} ({a.episodes or '?'} episodes)' for a in results]
-        choice, check = QInputDialog.getItem(self, "Search Results", "Choose an anime to add", titles, 0, False)
+        titles = [self.tr("{title} ({episodes} episodes)").format(title=a.title, episodes=a.episodes or "?") for a in results]
+        choice, check = QInputDialog.getItem(self, self.tr("Search Results"), self.tr("Choose an anime to add"), titles, 0, False)
         if not check:
             return
         anime = results[titles.index(choice)]
         try:
             self.lib.add(anime)
         except ValueError as e:
-            QMessageBox.warning(self, "Can't add", str(e))
+            QMessageBox.warning(self, self.tr("Can't add"), str(e))
             return
         self.refresh_current()
         self.search_box.clear()
@@ -199,7 +209,7 @@ class MainWindow(QMainWindow):
         self.update_cover_size()
 
     def refresh_current(self):
-        self.viewer_label.setText(self.current_list or "All Anime")
+        self.viewer_label.setText(self.current_list or self.tr("All Anime"))
         if self.current_list is None:
             animes = self.lib.all()
         else:
@@ -221,14 +231,14 @@ class MainWindow(QMainWindow):
     def selected_anime(self):
         row = self.table.currentRow()
         if row < 0:
-            QMessageBox.information(self, "No anime selected", "Click an anime in the table first")
+            QMessageBox.information(self, self.tr("No anime selected"), self.tr("Click an anime in the table first"))
             return None
         return self.shown_animes[row]
     def on_rate(self):
         anime = self.selected_anime()
         if anime is None:
             return
-        rating, ok = QInputDialog.getInt(self, "Rate", f"Rating for {anime.title} (1-10):", anime.rating or 5, 1, 10)
+        rating, ok = QInputDialog.getInt(self, self.tr("Rate"), self.tr("Rating for {title} (1-10):").format(title=anime.title), anime.rating or 5, 1, 10)
         if not ok:
             return
         self.lib.rate(anime.id, rating)
@@ -241,21 +251,21 @@ class MainWindow(QMainWindow):
         self.refresh_current()
 
     def on_new_list(self):
-        name, ok = QInputDialog.getText(self, "New List", "List name:")
+        name, ok = QInputDialog.getText(self, self.tr("New List"), self.tr("List name:"))
         if not ok or not name.strip():
             return
         try:
             self.lib.create_list(name.strip())
         except ValueError as e:
-            QMessageBox.warning(self, "Can't create list", str(e))
+            QMessageBox.warning(self, self.tr("Can't create list"), str(e))
             return
         self.refresh_lists()
 
     def on_delete_list(self):
         if self.current_list is None:
-            QMessageBox.information(self, "No list selected", "Select a list first.")
+            QMessageBox.information(self, self.tr("No list selected"), self.tr("Select a list first."))
             return
-        reply = QMessageBox.question(self, "Delete list", f"Are you sure you wan to delete the list {self.current_list}? The anime will stay in your library.")
+        reply = QMessageBox.question(self, self.tr("Delete list"), self.tr("Are you sure you want to delete the list {current_list}? The anime will stay in your library.").format(current_list = self.current_list)) ## traduzir
         if reply != QMessageBox.Yes:
             return
         self.lib.removeList(self.current_list)
@@ -269,9 +279,9 @@ class MainWindow(QMainWindow):
             return
         listnames = self.lib.listNames()
         if not listnames:
-            QMessageBox.information(self, "No lists", "You have no lists. Create one first.")
+            QMessageBox.information(self, self.tr("No lists"), self.tr("You have no lists. Create one first."))
             return
-        listname, ok = QInputDialog.getItem(self, "Add to List", f"Choose a list to add {anime.title} to:", listnames, 0, False)
+        listname, ok = QInputDialog.getItem(self, self.tr("Add to List"), self.tr("Choose a list to add {title} to:").format(title = anime.title), listnames, 0, False) ## traduzir
         if not ok:
             return
         self.lib.addToList(listname, anime.id)
@@ -279,10 +289,13 @@ class MainWindow(QMainWindow):
 
     def on_remove_from_list(self):
         if self.current_list is None:
-            QMessageBox.information(self, "No list selected", "Select a list first.")
+            QMessageBox.information(self, self.tr("No list selected"), self.tr("Select a list first."))
             return
         anime = self.selected_anime()
         if anime is None:
+            return
+        reply = QMessageBox.question(self, self.tr("Remove from list"), self.tr("Are you sure?"))
+        if reply != QMessageBox.Yes:
             return
         self.lib.removeFromList(self.current_list, anime.id)
         self.refresh_current()
@@ -291,11 +304,11 @@ class MainWindow(QMainWindow):
         anime = self.selected_anime()
         if anime is None:
             return
-        reply = QMessageBox.question(self, "Remove anime", f"Are you sure you want to remove {anime.title} from your library? This will also remove it from all lists.")
+        reply = QMessageBox.question(self, self.tr("Remove anime"), self.tr("Are you sure you want to remove {title} from your library? This will also remove it from all lists.").format(title = anime.title)) ## traduzir
         if reply != QMessageBox.Yes:
             return
         self.lib.remove(anime.id)
-        self.info_label.setText("Select an anime")
+        self.info_label.setText(self.tr("Select an anime"))
         self.cover_label.clear()
         self.refresh_current()
     

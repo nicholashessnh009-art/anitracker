@@ -270,5 +270,5 @@
         <source>Are you sure you want to remove {title} from your library? This will also remove it from all lists.</source>
         <translation>Você tem certeza que quer remover {title} da sua biblioteca? Isso também removerá ele de todas as listas.</translation>
     </message>
-</context>
+</context> 
 </TS>

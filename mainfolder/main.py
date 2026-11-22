@@ -19,13 +19,13 @@ def main(language="Português"):
 
     # carrega traduções ptBR
     if language == "Português":
-        translations = Path(__file__).resolve().parent / "translations"
+        translations = BUNDLE_DIR / "translations"
         translator = QTranslator()
         translator.load(str(translations / "anitracker_pt_br.qm"))
         app.installTranslator(translator)
         # traduz botões padrões do Qt
         qt_translator = QTranslator()
-        qt_translator.load(QLocale("pt_BR"), "qtbase", "_", QLibraryInfo.path(QLibraryInfo.TranslationsPath))
+        qt_translator.load(str(translations / "qtbase_pt_BR.qm"))
         app.installTranslator(qt_translator)
 
     janela = MainWindow(lib)

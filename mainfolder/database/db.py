@@ -2,6 +2,7 @@ import sqlite3
 import json
 import os
 from pathlib import Path
+from paths import DATA_DIR
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS anime (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -27,8 +28,7 @@ CREATE TABLE IF NOT EXISTS list_items (
 );
 """
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_DB_PATH = PROJECT_ROOT / "data" / "anitracker.db"
+DEFAULT_DB_PATH = DATA_DIR / "anitracker.db"
 
 def get_connection(path=DEFAULT_DB_PATH) -> sqlite3.Connection:
     if path != ":memory:":

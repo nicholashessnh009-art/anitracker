@@ -14,9 +14,9 @@ Quais são as dependências/coisas necessárias para o app funcionar?
 
 Como instalar dependências:
 
-    pip install -r dependencias.txt
+        pip install -r dependencias.txt
 
     OU:
 
-    pip install PySide6==6.12.0
-    pip install requests==2.34.2
+        pip install PySide6==6.12.0
+        pip install requests==2.34.2

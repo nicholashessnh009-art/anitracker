@@ -1,15 +1,19 @@
 # anitracker
-Projeto de AeP do segundo semestre, feito em Python.
+Projeto de Algoritmos e Programação do segundo semestre, feito em Python.
 
-Feito por Nicholas Hess  -  
-Turma 111 INFO AM do IFsul câmpus Novo Hamburgo  -  
+Feito por Nicholas Hess    
+Turma 111 INFO AM, do IFsul Câmpus Novo Hamburgo    
 Professor Lucas Mizusaki
 
-O que é?
+**O que é?**
 
 é um aplicativo feito para registrar séries (animes) que você assiste.     
 Você pode adicionar qualquer anime que você quiser, adicioná-lo em listas, e o avaliar. A Interface foi feita com PySide6, e o banco de dados com SQLite.    
 Para rodar o app, apenas execute o arquivo mainfolder/main.py (código fonte), ou baixe uma release no link abaixo:    
+
+[v1.0.0 para Windows](https://github.com/nicholashessnh009-art/anitracker/releases/tag/v1.0.0)    
+
+_**Se você não estiver usando Windows, por favor baixe o código fonte.**_    
 
 <img width="1144" height="820" alt="image" src="https://github.com/user-attachments/assets/d5946bb1-0a99-479d-a815-788ef57b3ac7" />
 

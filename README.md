@@ -7,10 +7,12 @@ Professor Lucas Mizusaki
 
 O que é?
 
-    é um aplicativo feito para registrar séries (animes) que você assiste. 
-    Você pode adicionar qualquer anime que você quiser, adicioná-lo em listas, e o avaliar. A Interface foi feita com PySide6. 
-    Para rodar o app, apenas execute o arquivo mainfolder/main.py.
+é um aplicativo feito para registrar séries (animes) que você assiste.     
+Você pode adicionar qualquer anime que você quiser, adicioná-lo em listas, e o avaliar. A Interface foi feita com PySide6, e o banco de dados com SQLite.    
+Para rodar o app, apenas execute o arquivo mainfolder/main.py (código fonte), ou baixe uma release no link abaixo:    
+
 <img width="1144" height="820" alt="image" src="https://github.com/user-attachments/assets/d5946bb1-0a99-479d-a815-788ef57b3ac7" />
+
 
 Quais são as dependências/coisas necessárias para o app funcionar?
 

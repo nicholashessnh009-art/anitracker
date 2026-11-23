@@ -1,7 +1,7 @@
 from models import Anime
 import sqlite3
 import json
-
+## nao vou traduzir isso 😡 :angry:
 class Library:
     def __init__(self, conn: sqlite3.Connection):
         self._conn = conn

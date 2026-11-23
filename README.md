@@ -34,7 +34,10 @@ Como instalar dependências:
 
         pip install -r dependencias.txt
 
-    OU:
+OU:
 
         pip install PySide6==6.12.0
         pip install requests==2.34.2
+
+
+Feito utilizando o AniList API para fins acadêmicos. Sem fins lucrativos.
